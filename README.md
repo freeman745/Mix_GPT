@@ -1,4 +1,5 @@
-# HGBT
+# Mix_GPT
+LLM with weather information, stock information, search engine, etc
 ## How to run the demo
 docker build -t hgpt_server .
 
@@ -13,9 +14,6 @@ delete: show how to call delete api
 learn: show how to call learn api
 
 chat: show how to call chat api
-
-## API docs
-[document](https://openweb3.atlassian.net/wiki/spaces/O/pages/4751361)https://openweb3.atlassian.net/wiki/spaces/O/pages/4751361
 
 ## Architect
 - app.py
