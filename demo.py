@@ -9,7 +9,7 @@ from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.callbacks.base import BaseCallbackHandler
 from langchain.chains import ConversationalRetrievalChain
 import pinecone
-from langchain.vectorstores import Pinecone
+from langchain.vectorstores import Pinecone, FAISS
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.agents import load_tools, initialize_agent, AgentType
 from langchain.tools import Tool
@@ -18,12 +18,12 @@ from langchain.tools import DuckDuckGoSearchRun
 from utils import RealWeatherTool, StockPriceTool, StockPercentageChangeTool, StockGetBestPerformingTool
 
 
-st.set_page_config(page_title="OpenWeb3: Online learning")
-st.title("OpenWeb3: Online learning")
-openai_api_key = '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'
-pinecone_api_key = 'd0da26f9-112f-42ee-a5ad-44255bddb3f7'
+st.set_page_config(page_title="GPT: Online learning")
+st.title("GPT: Online learning")
+openai_api_key = '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'
+pinecone_api_key = 'f2f8a0c9-36c3-4021-9cf0-5fc8633d7146'
 
-pinecone.init(api_key=pinecone_api_key, environment='asia-southeast1-gcp-free')
+pinecone.init(api_key=pinecone_api_key, environment='gcp-starter')
 
 serpapi_api_key = 'b97301ece7e8c52122c591ff3494e48720cdf89f13ae9930fe27a89b2d59dc82'
 
@@ -32,15 +32,6 @@ search = DuckDuckGoSearchRun()
 
 tools = []
 
-tools.append(
-    Tool.from_function(
-        name="Search",
-        func=search.run,
-        description="useful for when you need to answer questions about current events. You should ask targeted questions"
-    )
-)
-
-tools.append(RealWeatherTool())
 tools.append(StockPriceTool())
 tools.append(StockPercentageChangeTool())
 tools.append(StockGetBestPerformingTool())
@@ -70,17 +61,8 @@ def configure_retriever(uploaded_files):
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1500, chunk_overlap=200)
     splits = text_splitter.split_documents(docs)
 
-    # Create embeddings and store in vectordb
-    index_name = 'test'
-    if index_name not in pinecone.list_indexes():
-        # we create a new index
-        pinecone.create_index(
-            name=index_name,
-            metric='cosine',
-            dimension=1536  
-            )
     embeddings = OpenAIEmbeddings(openai_api_key=openai_api_key)
-    vectordb = Pinecone.from_documents(splits, embeddings, index_name=index_name)
+    vectordb = FAISS.from_documents(splits, embeddings)
 
     # Define retriever
     retriever = vectordb.as_retriever(search_type="mmr", search_kwargs={"k": 2, "fetch_k": 4})
@@ -137,7 +119,7 @@ tools.append(
     Tool.from_function(
         name="state-of-union-qa",
         func=qa_chain.run,
-        description="State of the Union QA - useful for when you need to ask questions about the Openweb3."
+        description="State of the Union QA - useful for when you need to ask questions about openweb3."
     )
 )
 
