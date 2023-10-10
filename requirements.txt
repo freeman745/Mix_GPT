@@ -16,3 +16,4 @@ openpyxl
 yfinance
 flask-cors
 nltk
+faiss-cpu
